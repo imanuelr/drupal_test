@@ -1,0 +1,126 @@
+<?php
+
+/**
+ * @file
+ * A module that lists links to recent content.
+ */
+
+/**
+ * Implements hook_help.
+ *
+ * Displays help and module information.
+ *
+ * @param path
+ *   Which path of the site we're using to display help
+ * @param arg
+ *   Array that holds the current path as returned from arg() function
+ */
+function socialtext_feed_help($path, $arg) {
+  switch ($path) {
+    case "admin/help#socialtext_feed":
+      return '<p>' . t("Provides a block to list SocialText feed.") . '</p>';
+      break;
+  }
+}
+
+/**
+ * Implements hook_menu().
+ *
+ * Menu items are automatically translated, and should not
+ * be wrapped in t().
+ */
+function socialtext_feed_menu() {
+  $items = array();
+
+  $items['admin/config/content/socialtext_feed'] = array(
+    'title' => 'SocialText Feed',
+    'description' => 'Configuration for SocialText Feed module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('socialtext_feed_form'),
+    'access arguments' => array('access administration pages'),
+    'menu-name' => "main-menu",
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function socialtext_feed_block_info() {
+  $blocks['socialtext_feed'] = array(
+    'info' => t('SocialText Feed'), //The name that will appear in the block list.
+    'cache' => DRUPAL_NO_CACHE, //Default
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ *
+ * Prepares the contents of the block(s).
+ */
+function socialtext_feed_block_view($delta = '') {
+  switch ($delta) {
+    case 'socialtext_feed':
+      $block['subject'] = t('SocialText Feed');
+      if (user_access('access content')) {
+        $jsonFeed = get_json_socialtext_feed();
+
+        for($i=0; $i<count($jsonFeed);$i++){
+          // to implement after learning theming
+          /*$block['content'][$i] = array(
+            'child' => array(
+                'user' => $jsonFeed[$i]['best_full_name'],
+                'time' => $jsonFeed[$i]['at'],
+                'body' => $jsonFeed[$i]['body'],
+            ),
+            '#theme' => 'render_signal',
+          );*/
+
+          $block['content'][$i]['#prefix'] = '<p>';
+          $block['content'][$i]['user'] = array(
+            '#type' => 'markup',
+            '#markup' => 'By: ' . $jsonFeed[$i]['best_full_name'],
+          );
+          $block['content'][$i]['time'] = array(
+            '#type' => 'markup',
+            '#markup' => ', at: ' . substr($jsonFeed[$i]['at'], 0, 19),
+          );
+          $block['content'][$i]['body'] = array(
+            '#type' => 'markup',
+            '#markup' => '<br/>Message:<br/>' . $jsonFeed[$i]['body'],
+          );
+          $block['content'][$i]['#suffix'] = '</p>';
+        }
+      }
+  }
+  return $block;
+}
+
+function get_json_socialtext_feed() {
+  // Group limit
+  $group = "90,42";
+  $limit = "3";
+  $url = "https://cegeka.socialtext.net/data/signals?limit=$limit&groups=$group";
+  $user = "imanuel.rennen@cegeka.be";
+  $pass = "Helpdesk09";
+
+  $data = array('user' => array('user' => $user, 'password' => $pass));
+  //Pull the url out of the drupal settings
+  $response = drupal_http_request($url, array(
+      'method' => 'GET',
+      'data' => json_encode($data),
+      'max_redirects' => 0,
+      'headers' => array(
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json',
+        'Authorization' => 'Basic ' . base64_encode("$user:$pass"),
+      )
+    )
+  );
+
+  return json_decode($response->data, true);
+}
+

@@ -1,0 +1,3 @@
+name = SocialText Feed
+description = A module that provides a block to list SocialText feed
+core = 7.x
