@@ -52,7 +52,7 @@
   </target>
   
   <target name="run_simpletests">
-	<exec dir="${basedir}/htdocs" executable="php" failonerror="true">
+	<exec dir="${basedir}" executable="php" failonerror="true">
 		<arg line="scripts/run-tests.sh --php ${php.bin} --url http://localhost/demo --xml ${logdir}"/>
 	</exec>
   </target>
