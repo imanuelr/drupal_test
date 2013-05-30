@@ -1,0 +1,85 @@
+<project name="demo" default="dist" basedir=".">
+    <description>
+        Demo build file
+    </description>
+  <!-- set global properties for this build -->
+  <property file="${basedir}/build.properties"/>
+  <property name="buildroot" location="${basedir}/${basepath}"/>
+  <property name="logdir" location="${buildroot}/build/logs"/>
+  <property name="strict-mode" value="false"/>
+  
+  <dirset id="codedirs" dir="${buildroot}">
+    <include name="${drupal.modules}"/>
+    <include name="${drupal.features}"/>
+  </dirset>
+  
+  <property name="php.patterns" value="**/*.php,**/*.inc,**/*.module,**/*.install,**/*.profile,**/*.test"/>
+  <property name="php.ext_exclude" value="features.inc,views_default.inc,layouts.inc,pages_default.inc,panels_default.inc,strongarm.inc,field_group.inc,features.field.inc"/>
+  <property name="php.ext" value="php,inc,module,install,profile"/>
+  <fileset id="phpcustom.modules" dir="${buildroot}/${drupal.modules}" includes="${php.patterns}"/>
+  <fileset id="phpcustom.features" dir="${buildroot}/${drupal.features}" includes="${php.patterns}">
+    <exclude name="**/*.features.inc"/>
+    <exclude name="**/*.views_default.inc"/>
+    <exclude name="**/*.layouts.inc"/>
+    <exclude name="**/*.pages_default.inc"/>
+    <exclude name="**/*.panels_default.inc"/>
+    <exclude name="**/*.strongarm.inc"/>
+    <exclude name="**/*.field_group.inc"/>
+    <exclude name="**/*.features.*.inc"/>
+  </fileset>
+  
+  <!-- MAIN TARGETS -->
+  <target name="init" depends="clean_artifacts"/>
+  <target name="phpTests" depends="php-lint, run_simpletests"/>
+  <target name="make_install" depends="clean_code,drush_make,drush_siteinstall"/>
+
+  <!-- SUB TARGETS -->
+  <target name="clean_artifacts">
+    <delete dir="${logdir}"/>
+    <mkdir dir="${logdir}"/>
+  </target>
+
+  <target name="clean_code">
+    <delete dir="${buildroot}/${drupal.docroot}"/>
+  </target>
+
+  <target name="php-lint" description="Perform syntax check of php files">
+    <apply executable="${php.bin}" failonerror="${strict-mode}">
+      <arg value="-l" />
+      <fileset refid="phpcustom.modules"/>
+      <fileset refid="phpcustom.features"/>
+      <fileset refid="phpcustom.theme"/>
+    </apply>
+  </target>
+  
+  <target name="run_simpletests">
+	<exec dir="${basedir}/htdocs" executable="php" failonerror="true">
+		<arg line="scripts/run-tests.sh --php ${php.bin} --url http://localhost/demo --xml ${logdir}"/>
+	</exec>
+  </target>
+
+  <!-- DRUSH: MAKE -->
+  <target name="drush_make">
+    <exec executable="${drush.bin}" failonerror="true">
+      <arg value="make"/>
+      <arg value="${drush.makefile}"/>
+      <arg value="${buildroot}/${drupal.docroot}"/>
+    </exec>
+  </target>
+
+  <!-- DRUSH: INSTALL -->
+  <target name="drush_siteinstall">
+    <exec executable="${drush.bin}"
+          failonerror="true"
+          dir="${buildroot}/${drupal.docroot}">
+      <!-- TODO: add language support -->
+      <arg value="site-install"/>
+      <arg value="${drush.install_profile}"/>
+      <arg value="--db-url=${drush.mysql}"/>
+      <arg value="--account-name=${drush.uname}"/>
+      <arg value="--account-pass=${drush.upwd}"/>
+      <arg value="--site-name=${drush.sitename}"/>
+      <arg value="-y"/>
+    </exec>
+  </target>
+</project>
