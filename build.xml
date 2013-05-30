@@ -53,7 +53,7 @@
   
   <target name="run_simpletests">
 	<exec dir="${basedir}" executable="php" failonerror="true">
-		<arg line="'${basedir}\scripts\run-tests.sh' --php ${php.bin} --url http://localhost/demo --xml ${logdir}"/>
+		<arg line="'${basedir}/${drupal.docroot}/scripts/run-tests.sh' --php ${php.bin} --url http://localhost/demo --xml ${logdir}"/>
 	</exec>
   </target>
 
