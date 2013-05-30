@@ -48,7 +48,6 @@
       <arg value="-l" />
       <fileset refid="phpcustom.modules"/>
       <fileset refid="phpcustom.features"/>
-      <fileset refid="phpcustom.theme"/>
     </apply>
   </target>
   
