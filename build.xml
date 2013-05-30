@@ -44,7 +44,7 @@
   </target>
 
   <target name="php-lint" description="Perform syntax check of php files">
-    <apply executable="${php.bin}" failonerror="${strict-mode}">
+    <apply executable="${php.bin}/php.exe" failonerror="${strict-mode}">
       <arg value="-l" />
       <fileset refid="phpcustom.modules"/>
       <fileset refid="phpcustom.features"/>
