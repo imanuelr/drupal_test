@@ -223,6 +223,15 @@ $databases = array (
       'driver' => 'mysql',
       'prefix' => '',
     ),
+    array (
+      'database' => 'test-dev-jenkins',
+      'username' => 'root',
+      'password' => 'root',
+      'host' => 'localhost',
+      'port' => '',
+      'driver' => 'mysql',
+      'prefix' => '',
+    ),
   ),
 );
 
