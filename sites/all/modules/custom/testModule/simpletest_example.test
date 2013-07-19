@@ -1,0 +1,20 @@
+<?php
+class SimpletestUnitTestExampleTestCase extends DrupalUnitTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Simpletest Example unit tests',
+      'description' => 'One failing one working test for jenkins testing purposes.',
+      'group' => 'Examples',
+    );
+  }
+
+  function testShouldFail() {
+   $this->assertTrue(false, 'This test should fail for testing purposes.');
+  }
+
+  function testShouldSucceed() {
+   $this->assertTrue(true, 'This test should succeed for testing purposes.');
+  }
+
+}
+?>
