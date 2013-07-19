@@ -215,7 +215,7 @@ $databases = array (
   array (
     'default' => 
     array (
-      'database' => 'test-dev',
+      'database' => 'test-dev-jenkins',
       'username' => 'root',
       'password' => 'root',
       'host' => 'localhost',
