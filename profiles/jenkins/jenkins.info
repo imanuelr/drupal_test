@@ -1,0 +1,5 @@
+name = Jenkins
+description = Minimal profile for running custom tests on Jenkins.
+core = 7.x
+hidden = TRUE
+
